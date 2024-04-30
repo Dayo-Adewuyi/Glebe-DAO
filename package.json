@@ -1,0 +1,35 @@
+{
+  "name": "glebe-dao",
+  "version": "1.0.0",
+  "description": "Glebe Dao helps tokenize illiquid assets",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dayo-Adewuyi/Glebe-DAO.git"
+  },
+  "author": "Nick Mudge",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Dayo-Adewuyi/Glebe-DAO/issues"
+  },
+  "homepage": "https://github.com/Dayo-Adewuyi/Glebe-DAO#readme",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-verify": "^2.0.6",
+    "@nomiclabs/hardhat-ethers": "^2.2.3",
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
+    "chai": "^5.1.0",
+    "dotenv": "^16.4.0",
+    "ethereum-waffle": "^2.2.0",
+    "ethers": "^5.7.2",
+    "prettier": "^3.2.4",
+    "prettier-plugin-solidity": "^1.3.1",
+    "standard": "^17.1.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.1",
+    "hardhat": "^2.22.3"
+  }
+}
