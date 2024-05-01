@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Pausable.sol";
 
-contract RealEstateToken is ERC1155, ERC1155Pausable, Ownable {
+contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable {
 
 
     function pause() public onlyOwner {

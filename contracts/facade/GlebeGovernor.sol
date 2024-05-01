@@ -12,12 +12,12 @@ import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFractio
 contract MyGovernor is Governor, GovernorSettings, GovernorCountingSimple, GovernorStorage, GovernorVotes, GovernorVotesQuorumFraction {
     constructor(IVotes _token)
         Governor("Glebe DAO")
-        GovernorSettings(1 days, 1 weeks, 3)
+        GovernorSettings(1 days, 1 weeks, 3e18)
         GovernorVotes(_token)
         GovernorVotesQuorumFraction(5)
     {}
 
-    
+    // The following functions are overrides required by Solidity.
 
     function votingDelay()
         public
