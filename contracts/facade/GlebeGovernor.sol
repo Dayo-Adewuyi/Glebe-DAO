@@ -2,7 +2,9 @@
 pragma solidity ^0.8.1;
 
 interface IGlebeEstate {
-    function listAsset(address _owner, uint256 _amount, uint256 _price, string memory _uri) external returns (uint256);
+    function listAsset(address _owner, uint256 _amount, uint256 _price, string calldata _uri, 
+        string calldata _description,
+        string calldata _location) external returns (uint256);
     function distributeDividends(uint256 _tokenId, uint256 _totalAmount) external;
 }
 
@@ -24,7 +26,9 @@ contract GlebeGovernor {
         uint256 againstVotes;
         uint256 creationTime;
         uint256 endTime;
-        uint256 tokenId; // ID of the issued token
+        uint256 tokenId; 
+        string uri;
+        string location;
     }
 
     struct AssetData {
@@ -60,7 +64,7 @@ contract GlebeGovernor {
         emit RevenueReceived(0, msg.value); // 0 represents ethers received for no specific token
     }
 
-    function createProposal(string memory _description, uint256 _duration, uint256 _shares, uint256 _sharePrice) onlyAdmin external {
+    function createProposal(string calldata _description, uint256 _duration, uint256 _shares, uint256 _sharePrice, string calldata _uri, string calldata _location) onlyAdmin external {
         uint256 proposalId = proposals.length;
         uint256 endTime = block.timestamp + _duration;
         proposals.push(Proposal({
@@ -74,7 +78,9 @@ contract GlebeGovernor {
             againstVotes: 0,
             creationTime: block.timestamp,
             endTime: endTime,
-            tokenId: 0
+            tokenId: 0,
+            uri: _uri,
+            location: _location
         }));
 
         emit ProposalCreated(proposalId, msg.sender, _description, endTime);
@@ -107,7 +113,7 @@ contract GlebeGovernor {
 
         if (proposal.forVotes > proposal.againstVotes) {
             proposal.status = ProposalStatus.Approved;
-            proposal.tokenId = glebeEstate.listAsset(proposal.proposer, proposal.shares, proposal.price, proposal.description);
+            proposal.tokenId = glebeEstate.listAsset(proposal.proposer, proposal.shares, proposal.price, proposal.uri, proposal.description, proposal.location);
             emit ProposalExecuted(_proposalId, true);
         } else {
             proposal.status = ProposalStatus.Rejected;

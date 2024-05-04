@@ -19,6 +19,15 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
         uint256 balance;
     }
 
+    struct Listing {
+        address owner;
+        uint256 amount;
+        uint256 price;
+        string uri;
+        string description;
+        string location;
+    }
+
     uint256 public nextTokenId;
     mapping(uint256 => TokenHolder[]) private tokenHolders;
     mapping(uint256 => uint256) public totalSupplyByTokenId;
@@ -26,7 +35,7 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
     mapping(uint256 => uint256) public tokenPrice; // Token ID to price mapping
     mapping(uint256 => uint256) public totalDividends;
     mapping(address => mapping(uint256 => uint256)) public addressToDividends;
-
+    mapping(uint256 => Listing) public listings;
     event Listed(
         address indexed owner,
         uint256 tokenId,
@@ -54,7 +63,7 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
         _unpause();
     }
 
-    function symbol() public pure returns (string memory){
+    function symbol() public pure returns (string memory) {
         return "GLEB";
     }
 
@@ -66,16 +75,25 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
         address _owner,
         uint256 _amount,
         uint256 _price,
-        string memory _uri
-    ) external whenNotPaused onlyOwner returns(uint256) {
+        string calldata _uri,
+        string calldata _description,
+        string calldata _location
+    ) external whenNotPaused onlyOwner returns (uint256) {
         require(_owner != address(0), "Invalid owner address");
         require(_amount > 0, "Invalid token amount");
-
-        uint256 tokenId = nextTokenId++;
+        nextTokenId++;
+        uint256 tokenId = nextTokenId;
         totalSupplyByTokenId[tokenId] = _amount;
         tokenIdToUri[tokenId] = _uri;
         tokenPrice[tokenId] = _price;
-
+        listings[tokenId] = Listing(
+            _owner,
+            _amount,
+            _price,
+            _uri,
+            _description,
+            _location
+        );
         _mint(_owner, tokenId, _amount, "");
         tokenHolders[tokenId].push(TokenHolder(_owner, _amount));
         emit Listed(_owner, tokenId, _amount, _price);
@@ -87,7 +105,7 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
         address _to,
         uint256 _tokenId,
         uint256 _amount
-    ) external nonReentrant whenNotPaused payable {
+    ) external payable nonReentrant whenNotPaused {
         require(
             msg.sender == _from || isApprovedForAll(_from, msg.sender),
             "Caller is not approved"
@@ -101,53 +119,49 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
         // Transfer tokens
         _safeTransferFrom(_from, _to, _tokenId, _amount, "");
 
-       
         payable(_from).transfer(msg.value);
 
         emit Transfer(_from, _to, _tokenId, _amount);
     }
 
-    function uri(uint256 _tokenId)
-        public
-        view
-        override
-        returns (string memory)
-    {
+    function uri(
+        uint256 _tokenId
+    ) public view override returns (string memory) {
         return tokenIdToUri[_tokenId];
     }
 
-function distributeDividends(uint256 _tokenId, uint256 _totalAmount)
-    external
-    nonReentrant
-    whenNotPaused
-    onlyOwner
-{
-    require(totalSupplyByTokenId[_tokenId] > 0, "Token not found");
-    require(_totalAmount > 0, "Invalid total dividend amount");
+    function distributeDividends(
+        uint256 _tokenId,
+        uint256 _totalAmount
+    ) external nonReentrant whenNotPaused onlyOwner {
+        require(totalSupplyByTokenId[_tokenId] > 0, "Token not found");
+        require(_totalAmount > 0, "Invalid total dividend amount");
 
-    // Calculate total balance of the token
-    uint256 totalTokenBalance = totalSupplyByTokenId[_tokenId];
-    require(totalTokenBalance > 0, "No tokens issued");
+        // Calculate total balance of the token
+        uint256 totalTokenBalance = totalSupplyByTokenId[_tokenId];
+        require(totalTokenBalance > 0, "No tokens issued");
 
-    // Calculate dividend per token
-    uint256 dividendPerToken = _totalAmount / totalTokenBalance;
+        // Calculate dividend per token
+        uint256 dividendPerToken = _totalAmount / totalTokenBalance;
 
-    // Distribute dividends proportionally to token holders
-    uint256 numHolders = tokenHolders[_tokenId].length;
-    for (uint256 i = 0; i < numHolders; i++) {
-        address tokenHolder = tokenHolders[_tokenId][i].holder;
-        uint256 balance = tokenHolders[_tokenId][i].balance;
-        uint256 dividends = balance * dividendPerToken;
-        addressToDividends[tokenHolder][_tokenId] += dividends;
+        // Distribute dividends proportionally to token holders
+        uint256 numHolders = tokenHolders[_tokenId].length;
+        for (uint256 i = 0; i < numHolders; i++) {
+            address tokenHolder = tokenHolders[_tokenId][i].holder;
+            uint256 balance = tokenHolders[_tokenId][i].balance;
+            uint256 dividends = balance * dividendPerToken;
+            addressToDividends[tokenHolder][_tokenId] += dividends;
+        }
+
+        // Update total dividends for the token
+        totalDividends[_tokenId] += _totalAmount;
+
+        emit DividendsDistributed(_tokenId, _totalAmount);
     }
 
-    // Update total dividends for the token
-    totalDividends[_tokenId] += _totalAmount;
-
-    emit DividendsDistributed(_tokenId, _totalAmount);
-}
-   
-    function withdrawDividends(uint256 _tokenId) whenNotPaused external nonReentrant {
+    function withdrawDividends(
+        uint256 _tokenId
+    ) external whenNotPaused nonReentrant {
         uint256 dividends = addressToDividends[msg.sender][_tokenId];
         require(dividends > 0, "No dividends to withdraw");
 
@@ -157,27 +171,27 @@ function distributeDividends(uint256 _tokenId, uint256 _totalAmount)
         emit DividendsWithdrawn(msg.sender, dividends);
     }
 
-   
+    function _safeTransferFrom(
+        address _from,
+        address _to,
+        uint256 _id,
+        uint256 _amount,
+        bytes memory _data
+    ) internal override {
+        super._safeTransferFrom(_from, _to, _id, _amount, _data);
 
- function _safeTransferFrom(
-    address _from,
-    address _to,
-    uint256 _id,
-    uint256 _amount,
-    bytes memory _data
-) internal override {
-    super._safeTransferFrom(_from, _to, _id, _amount, _data);
+        // Update token holder balances
+        _updateTokenHolderBalance(_id, _from);
+        _updateTokenHolderBalance(_id, _to);
 
-    // Update token holder balances
-    _updateTokenHolderBalance(_id, _from);
-    _updateTokenHolderBalance(_id, _to);
+        // Distribute dividends upon token transfer
+        distributeDividendsUponTransfer(_from, _to, _id, _amount);
+    }
 
-    // Distribute dividends upon token transfer
-    distributeDividendsUponTransfer(_from, _to, _id, _amount);
-}
-
-
-    function _updateTokenHolderBalance(uint256 _tokenId, address _holder) private {
+    function _updateTokenHolderBalance(
+        uint256 _tokenId,
+        address _holder
+    ) private {
         bool holderFound = false;
         uint256 holderBalance = balanceOf(_holder, _tokenId);
         uint256 numHolders = tokenHolders[_tokenId].length;
@@ -221,16 +235,18 @@ function distributeDividends(uint256 _tokenId, uint256 _totalAmount)
         uint256 balance = balanceOf(_holder, _tokenId);
         uint256 totalTokenBalance = totalSupplyByTokenId[_tokenId];
         uint256 totalDividendsForToken = totalDividends[_tokenId];
-        
+
         if (totalTokenBalance == 0 || totalDividendsForToken == 0) {
             return 0;
         }
 
-        uint256 proportionalDividends = _amount.mul(totalDividendsForToken).div(totalTokenBalance);
+        uint256 proportionalDividends = _amount.mul(totalDividendsForToken).div(
+            totalTokenBalance
+        );
         return proportionalDividends.mul(balance).div(_amount);
     }
 
-      function _beforeTokenTransfer(
+    function _beforeTokenTransfer(
         address operator,
         address from,
         address to,

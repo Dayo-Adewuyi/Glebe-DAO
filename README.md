@@ -28,9 +28,8 @@ Glebe is a real world asset tokenization platform on the Canto blockchain. The c
 
 ## CONTRACT ADDRESSES
 
-glebeToken deployed: 0x85879d8C4de63fEb282C26Bd07eFe86Ce863dFF3
-glebeEstate deployed: 0x367eF69A1B251DB4832617e6c5B1A53D2261945d
-GlebeGovernor deployed: 0xF886Ca2c8ef5ea269d54Cd86225a8E8b2072f317
-
+glebeToken deployed: 0x5Ec6DC0d5A9b43409ad7Ef74dEbA1277f5A84B32
+glebeEstate deployed: 0x987bb1a4E5e385372e4DAcEDF509BFc7651Ae742
+GlebeGovernor deployed: 0xF27d3edA46bcC7Fb0Cb216fACC7E45583b3E580dgit 
 
 
