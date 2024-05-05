@@ -1,6 +1,6 @@
 # GLEBE 
 
-Glebe is a real world asset tokenization platform on the Canto blockchain. The contract enables fractional ownership of real estate properties, allowing investors to purchase and trade fractional ownership units (tokens) representing shares of the assets. Additionally, the contract facilitates dividend distribution to token holders based on the performance of the underlying assets.
+Glebe is a real world asset tokenization platform on the Canto blockchain. The contract enables fractional ownership of real world assets, allowing investors to purchase and trade fractional ownership units (tokens) representing shares of the assets. Additionally, the contract facilitates dividend distribution to token holders based on the performance of the underlying assets.
 
 ## Features
 
