@@ -20,6 +20,7 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
     }
 
     struct Listing {
+        uint256 id;
         address owner;
         uint256 amount;
         uint256 price;
@@ -87,6 +88,7 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
         tokenIdToUri[tokenId] = _uri;
         tokenPrice[tokenId] = _price;
         listings[tokenId] = Listing(
+            tokenId,
             _owner,
             _amount,
             _price,
@@ -207,6 +209,14 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
         }
     }
 
+   function getListings() public view returns (Listing[] memory) {
+    Listing[] memory allListings = new Listing[](nextTokenId);
+    for (uint256 i = 1; i <= nextTokenId; i++) {
+        allListings[i - 1] = listings[i];
+    }
+    return allListings;
+}
+
     function distributeDividendsUponTransfer(
         address _from,
         address _to,
@@ -268,3 +278,4 @@ contract GlebeEstate is ERC1155, ERC1155Pausable, Ownable, ReentrancyGuard {
         super._afterTokenTransfer(operator, from, to, ids, amounts, data);
     }
 }
+

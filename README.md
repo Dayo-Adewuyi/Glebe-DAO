@@ -12,7 +12,7 @@ Glebe is a real world asset tokenization platform on the Canto blockchain. The c
 
 - **Dividend Distribution**: The contract enables the distribution of dividends to token holders based on the performance of the underlying real estate assets. Dividends are distributed proportionally to the number of tokens held by each investor.
 
-- **CANTO Collection**: Users can purchase fractional ownership units by transferring NOTE to the contract along with the token transfer. The asset manager receives the NOTE, effectively raising funds from the sale of shares.
+- **CANTO Collection**: Users can purchase fractional ownership units by transferring CANTO to the contract along with the token transfer. The asset manager receives the CANTO, effectively raising funds from the sale of shares.
 
 - **DAO Governance**: Glebe is governed by a decentralized autonomous organization (DAO), allowing token holders to collectively make decisions regarding the management and operation of the contract.
 
@@ -24,12 +24,17 @@ Glebe is a real world asset tokenization platform on the Canto blockchain. The c
 
 - `distributeDividends`: Enables the contract owner to distribute dividends to token holders based on the performance of the underlying real estate assets.
 
-- `withdrawDividends`: Allows token holders to withdraw their accumulated dividends in NOTE.
+- `withdrawDividends`: Allows token holders to withdraw their accumulated dividends in CANTO.
 
 ## CONTRACT ADDRESSES
 
-glebeToken deployed: 0x5Ec6DC0d5A9b43409ad7Ef74dEbA1277f5A84B32
-glebeEstate deployed: 0x987bb1a4E5e385372e4DAcEDF509BFc7651Ae742
-GlebeGovernor deployed: 0xF27d3edA46bcC7Fb0Cb216fACC7E45583b3E580dgit 
+glebeToken deployed: 0x1bEcbe85c08fB2aA31666fB1576636EA7A92E64A
+glebeEstate deployed: 0x6072a7aD90Ed660E76e97D090a6269ad9992a314
+GlebeGovernor deployed: 0x1BAfcDBe056FA841F5079f76D15a7c7342F41F3E
+
+## WHAT'S NEXT?
+
+- Deploy contracts leveraging on EIP2535 on the CANTO MAINNET
+- GO Live by q3
 
 

@@ -41,6 +41,7 @@ contract GlebeGovernor {
     mapping(uint256 => AssetData) public assetData;
     mapping(address => bool ) private admins;
     address GlebeToken;
+    address glebeEstateAddress;
 
     IGlebeEstate public glebeEstate;
 
@@ -52,6 +53,7 @@ contract GlebeGovernor {
 
     constructor(address _glebeEstate, address _glebeToken) {
         glebeEstate = IGlebeEstate(_glebeEstate);
+    glebeEstateAddress = _glebeEstate;
         GlebeToken = _glebeToken;
         admins[msg.sender] = true;
     }
@@ -135,12 +137,14 @@ contract GlebeGovernor {
         emit RevenueReceived(_tokenId, msg.value);
     }
 
-    function declareDividends(uint256 _tokenId) external {
+    function declareDividends(uint256 _tokenId) external onlyAdmin {
         require(_tokenId > 0, "Invalid token ID");
         uint256 revenue = assetData[_tokenId].revenue;
         require(revenue > 0, "No revenue to declare");
 
         glebeEstate.distributeDividends(_tokenId, revenue);
+         payable(glebeEstateAddress).transfer(revenue);
+
         assetData[_tokenId].dividends += revenue;
         assetData[_tokenId].revenue = 0;
 
