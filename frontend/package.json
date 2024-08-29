@@ -1,6 +1,7 @@
 {
   "name": "glebe",
   "version": "0.1.0",
+  "homepage": ".",
   "private": true,
   "dependencies": {
     "@chakra-ui/button": "^2.1.0",
